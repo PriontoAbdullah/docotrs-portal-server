@@ -55,9 +55,62 @@ client.connect((err) => {
 			console.log(result.insertedCount, 'Appointment Inserted');
 			res.send(result.insertedCount > 0);
 		});
-    });
-    
+	});
 
+	//Routes -- Update method
+	// Updating Booking Status
+	app.post('/updateBookingStatus', (req, res) => {
+		const ap = req.body;
+		console.log(ap);
+		client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+		client.connect((err) => {
+			const collection = client.db('doctorsPortal').collection('appointments');
+			collection.updateOne(
+				{ _id: ObjectId(ap.id) },
+				{
+					$set: { status: ap.status },
+					$currentDate: { lastModified: true }
+				},
+				(err, result) => {
+					if (err) {
+						console.log(err);
+						res.status(500).send({ message: err });
+					} else {
+						res.send(result);
+						console.log(result);
+					}
+					client.close();
+				}
+			);
+		});
+	});
+
+	// Updating Appointment Date/Time
+	app.post('/updateAppointmentTime', (req, res) => {
+		const ap = req.body;
+		console.log(ap);
+		client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+		client.connect((err) => {
+			const collection = client.db('doctorsPortal').collection('appointments');
+			collection.updateOne(
+				{ _id: ObjectId(ap.id) },
+				{
+					$set: { date: ap.date, time: ap.time },
+					$currentDate: { lastModified: true }
+				},
+				(err, result) => {
+					if (err) {
+						console.log(err);
+						res.status(500).send({ message: err });
+					} else {
+						res.send(result);
+						console.log(result);
+					}
+					client.close();
+				}
+			);
+		});
+	});
 });
 
 const port = process.env.PORT || 5000;
