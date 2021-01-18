@@ -61,7 +61,6 @@ client.connect((err) => {
 	// Updating Booking Status
 	app.post('/updateBookingStatus', (req, res) => {
 		const ap = req.body;
-		console.log(ap);
 		appointmentCollection.updateOne(
 			{ _id: ObjectId(ap.id) },
 			{
@@ -73,8 +72,8 @@ client.connect((err) => {
 					console.log(err);
 					res.status(500).send({ message: err });
 				} else {
-					res.send(result);
-					console.log(result);
+					res.send(result.modifiedCount > 0);
+					console.log(result.modifiedCount, 'Update Booking Status');
 				}
 			}
 		);
@@ -83,7 +82,6 @@ client.connect((err) => {
 	// Updating Appointment Date/Time
 	app.post('/updateAppointmentTime', (req, res) => {
 		const ap = req.body;
-		console.log(ap);
 		appointmentCollection.updateOne(
 			{ _id: ObjectId(ap.id) },
 			{
@@ -95,8 +93,29 @@ client.connect((err) => {
 					console.log(err);
 					res.status(500).send({ message: err });
 				} else {
-					res.send(result);
-					console.log(result);
+					res.send(result.modifiedCount > 0);
+					console.log(result.modifiedCount, 'Update Appointment Date / Time');
+				}
+			}
+		);
+	});
+
+	// Added Meeting Link
+	app.post('/addedMeetingLink', (req, res) => {
+		const ap = req.body;
+		appointmentCollection.updateOne(
+			{ _id: ObjectId(ap.id) },
+			{
+				$set: { meeting: ap.meeting },
+				$currentDate: { lastModified: true }
+			},
+			(err, result) => {
+				if (err) {
+					console.log(err);
+					res.status(500).send({ message: err });
+				} else {
+					res.send(result.modifiedCount > 0);
+					console.log(result.modifiedCount, 'Meeting Link Inserted');
 				}
 			}
 		);
