@@ -121,6 +121,27 @@ client.connect((err) => {
 		);
 	});
 
+	// Updating Appointment Visiting Status
+	app.post('/updateVisitingStatus', (req, res) => {
+		const ap = req.body;
+		appointmentCollection.updateOne(
+			{ _id: ObjectId(ap.id) },
+			{
+				$set: { visitingStatus: ap.visitingStatus },
+				$currentDate: { lastModified: true }
+			},
+			(err, result) => {
+				if (err) {
+					console.log(err);
+					res.status(500).send({ message: err });
+				} else {
+					res.send(result.modifiedCount > 0);
+					console.log(result.modifiedCount, 'Update Visiting Status');
+				}
+			}
+		);
+	});
+
 
 });
 
