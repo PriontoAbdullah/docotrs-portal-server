@@ -142,6 +142,48 @@ client.connect((err) => {
 		);
 	});
 
+	// Updating Prescription
+	app.post('/updatePrescription', (req, res) => {
+		const ap = req.body;
+		appointmentCollection.updateOne(
+			{ _id: ObjectId(ap.id) },
+			{
+				$set: { prescription: ap.prescription },
+				$currentDate: { lastModified: true }
+			},
+			(err, result) => {
+				if (err) {
+					console.log(err);
+					res.status(500).send({ message: err });
+				} else {
+					res.send(result.modifiedCount > 0);
+					console.log(result.modifiedCount, 'Update Prescription');
+				}
+			}
+		);
+	});
+
+	// Updating Disease
+	app.post('/updateDisease', (req, res) => {
+		const ap = req.body;
+		appointmentCollection.updateOne(
+			{ _id: ObjectId(ap.id) },
+			{
+				$set: { disease: ap.problem },
+				$currentDate: { lastModified: true }
+			},
+			(err, result) => {
+				if (err) {
+					console.log(err);
+					res.status(500).send({ message: err });
+				} else {
+					res.send(result.modifiedCount > 0);
+					console.log(result.modifiedCount, 'Update Disease');
+				}
+			}
+		);
+	});
+
 
 });
 
