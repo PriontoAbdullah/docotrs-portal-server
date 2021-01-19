@@ -4,10 +4,13 @@ const BodyParser = require('body-parser');
 const MongoClient = require('mongodb').MongoClient;
 const ObjectId = require('mongodb').ObjectId;
 require('dotenv').config();
+const fileUpload = require('express-fileupload');
 
 const app = express();
 app.use(cors());
 app.use(BodyParser.json());
+app.use(express.static('doctors'));
+app.use(fileUpload());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.v9ypd.mongodb.net/${process.env
 	.DB_NAME}?retryWrites=true&w=majority`;
@@ -55,6 +58,35 @@ client.connect((err) => {
 			console.log(result.insertedCount, 'Appointment Inserted');
 			res.send(result.insertedCount > 0);
 		});
+	});
+
+	// Insert A New Doctor
+	app.post('/addADoctor', (req, res) => {
+		const file = req.files.file;
+		const id = req.body.id;
+		const category = req.body.category;
+		const name = req.body.name;
+		const education = req.body.education;
+		const designation = req.body.designation;
+		const department = req.body.department;
+		const hospital = req.body.hospital;
+		const img = req.body.img;
+
+		const newImg = file.data;
+		const encImg = newImg.toString('base64');
+
+		var image = {
+			contentType: file.mimetype,
+			size: file.size,
+			img: Buffer.from(encImg, 'base64')
+		};
+
+		doctorCollection
+			.insertOne({ id, category, name, education, designation, department, hospital, img, image })
+			.then((result) => {
+				res.send(result.insertedCount > 0);
+				console.log(result.insertedCount, 'Doctor Inserted');
+			});
 	});
 
 	//Routes -- Update method
@@ -183,8 +215,6 @@ client.connect((err) => {
 			}
 		);
 	});
-
-
 });
 
 const port = process.env.PORT || 5000;
