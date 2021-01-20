@@ -20,6 +20,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 client.connect((err) => {
 	const doctorCollection = client.db('doctorsPortal').collection('doctors');
 	const appointmentCollection = client.db('doctorsPortal').collection('appointments');
+	const reviewCollection = client.db('doctorsPortal').collection('reviews');
 
 	console.log('Doctors Portal DataBase Connected');
 
@@ -37,6 +38,13 @@ client.connect((err) => {
 	// Get all Booked Appointments
 	app.get('/bookedAppointments', (req, res) => {
 		appointmentCollection.find({}).toArray((err, documents) => {
+			res.send(documents);
+		});
+	});
+
+	// Get all Reviews
+	app.get('/allReviews', (req, res) => {
+		reviewCollection.find({}).toArray((err, documents) => {
 			res.send(documents);
 		});
 	});
@@ -87,6 +95,15 @@ client.connect((err) => {
 				res.send(result.insertedCount > 0);
 				console.log(result.insertedCount, 'Doctor Inserted');
 			});
+	});
+
+	// Added A New Doctor Review
+	app.post('/addReview', (req, res) => {
+		const reviewData = req.body;
+		reviewCollection.insertOne(reviewData).then((result) => {
+			res.send(result.insertedCount > 0);
+			console.log(result.insertedCount, 'Review Data Inserted');
+		});
 	});
 
 	//Routes -- Update method
