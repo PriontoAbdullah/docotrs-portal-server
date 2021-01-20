@@ -215,6 +215,28 @@ client.connect((err) => {
 			}
 		);
 	});
+
+	// Added Payment
+	app.post('/addedPayment', (req, res) => {
+		const ap = req.body;
+		appointmentCollection.updateOne(
+			{ _id: ObjectId(ap.id) },
+			{
+				$set: { paymentID: ap.paymentID },
+				$currentDate: { lastModified: true }
+			},
+			(err, result) => {
+				if (err) {
+					console.log(err);
+					res.status(500).send({ message: err });
+				} else {
+					res.send(result.modifiedCount > 0);
+					console.log(result.modifiedCount, 'Payment Inserted');
+				}
+			}
+		);
+	});
+
 });
 
 const port = process.env.PORT || 5000;
